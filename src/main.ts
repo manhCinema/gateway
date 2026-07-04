@@ -1,18 +1,17 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ConfigService } from '@nestjs/config'
-import { Logger } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-
+import { getCorsConfig, getValidationPipeConfig } from './core/config'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const config = app.get(ConfigService)
   const logger = new Logger()
 
-  app.enableCors({
-    origin: config.getOrThrow<string>('HTTP_CORS')?.split(','),
-    credentials: true
-  })
+  app.useGlobalPipes(new ValidationPipe(getValidationPipeConfig()))
+
+  app.enableCors(getCorsConfig(config))
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Cinema Gateway Service')
     .setDescription('The cinema gateway service API description')
