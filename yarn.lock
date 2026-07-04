@@ -875,10 +875,10 @@
   dependencies:
     "@trivago/prettier-plugin-sort-imports" "^5.2.2"
 
-"@manhdev2/core@^4.0.6":
-  version "4.0.6"
-  resolved "https://registry.npmjs.org/@manhdev2/core/-/core-4.0.6.tgz#ef228f9a7b9a559761997044310232969ff3c4d2"
-  integrity sha512-To8RpobuIj2zgDfRMDLHkAFBGMih1JnuxylnDSaY4j2XHWICdPcbigofPQLpjr2jhQtEvFk039CbPaGCnl6uTQ==
+"@manhdev2/core@^4.0.8":
+  version "4.0.8"
+  resolved "https://registry.npmjs.org/@manhdev2/core/-/core-4.0.8.tgz#e34bfc4524c8ecc70347f360202b61233b459c46"
+  integrity sha512-SHSBFHNLmcXkFml/2gbfNWaODWFav2b68OFDrDeSDQ4wrjleieSbs5fikU52dyI6rHObDAWQoUYh5hAP5I7h4w==
   dependencies:
     "@manhdev2/core" "^1.0.0"
     "@trivago/prettier-plugin-sort-imports" "^5.2.2"
