@@ -1,23 +1,29 @@
 import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UsePipes,
-  ValidationPipe
+	Body,
+	Controller,
+	HttpCode,
+	HttpStatus,
+	Post,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common'
-import { SendOtpRequest } from './dto'
 import { ApiOperation } from '@nestjs/swagger'
+
+import { AuthClientGrpc } from './auth.grpc'
+import { SendOtpRequest } from './dto'
+
 @Controller('auth')
 export class AuthController {
-  @ApiOperation({
-    summary: 'Send OTP',
-    description: 'Send OTP to email or phone number'
-    
-  })
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @Post('otp/send')
-  @HttpCode(HttpStatus.OK)
-  public async sendOtp(@Body() request: SendOtpRequest) {}
+	public constructor(private readonly authClientGrpc: AuthClientGrpc) {}
+
+	@ApiOperation({
+		summary: 'Send OTP',
+		description: 'Send OTP to email or phone number'
+	})
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@Post('otp/send')
+	@HttpCode(HttpStatus.OK)
+	public async sendOtp(@Body() request: SendOtpRequest) {
+		return this.authClientGrpc.sendOtp(request)
+	}
 }
