@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { GrpcExceptionFilter } from 'src/shared/filters'
 
 import { AppModule } from './app.module'
 import { getCorsConfig, getValidationPipeConfig } from './core/config'
@@ -12,7 +13,7 @@ async function bootstrap() {
 	const logger = new Logger()
 
 	app.useGlobalPipes(new ValidationPipe(getValidationPipeConfig()))
-
+	app.useGlobalFilters(new GrpcExceptionFilter())
 	app.enableCors(getCorsConfig(config))
 	const swaggerConfig = new DocumentBuilder()
 		.setTitle('Cinema Gateway Service')
