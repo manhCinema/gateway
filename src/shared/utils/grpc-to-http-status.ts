@@ -1,5 +1,5 @@
+import { RpcStatus } from '@manhdev2/common'
 import { HttpStatus } from '@nestjs/common'
-import { RpcStatus } from 'src/shared/enums'
 
 export const grpcToHttpStatus: Record<number, number> = {
 	[RpcStatus.OK]: HttpStatus.OK,
