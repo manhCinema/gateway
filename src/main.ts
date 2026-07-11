@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import cookieParser from 'cookie-parser'
 import { GrpcExceptionFilter } from 'src/shared/filters'
 
 import { AppModule } from './app.module'
@@ -15,6 +17,8 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe(getValidationPipeConfig()))
 	app.useGlobalFilters(new GrpcExceptionFilter())
 	app.enableCors(getCorsConfig(config))
+	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
+
 	const swaggerConfig = new DocumentBuilder()
 		.setTitle('Cinema Gateway Service')
 		.setDescription('The cinema gateway service API description')
@@ -35,3 +39,5 @@ async function bootstrap() {
 }
 
 bootstrap()
+
+// 8 26

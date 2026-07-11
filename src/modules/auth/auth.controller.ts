@@ -4,17 +4,24 @@ import {
 	HttpCode,
 	HttpStatus,
 	Post,
+	Res,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { ApiOperation } from '@nestjs/swagger'
+import { Response } from 'express'
+import { lastValueFrom } from 'rxjs'
 
 import { AuthClientGrpc } from './auth.grpc'
 import { SendOtpRequest, VerifyOtpRequest } from './dto'
 
 @Controller('auth')
 export class AuthController {
-	public constructor(private readonly authClientGrpc: AuthClientGrpc) {}
+	public constructor(
+		private readonly authClientGrpc: AuthClientGrpc,
+		private readonly configService: ConfigService
+	) {}
 
 	@ApiOperation({
 		summary: 'Send OTP',
@@ -24,7 +31,7 @@ export class AuthController {
 	@Post('otp/send')
 	@HttpCode(HttpStatus.OK)
 	public async sendOtp(@Body() request: SendOtpRequest) {
-		return this.authClientGrpc.sendOtp(request)
+		return await lastValueFrom(this.authClientGrpc.sendOtp(request))
 	}
 	@ApiOperation({
 		summary: 'Verify OTP',
@@ -33,7 +40,32 @@ export class AuthController {
 	@UsePipes(new ValidationPipe({ transform: true }))
 	@Post('otp/verify')
 	@HttpCode(HttpStatus.OK)
-	public async verifyOtp(@Body() request: VerifyOtpRequest) {
-		return this.authClientGrpc.verifyOtp(request)
+	public async verifyOtp(
+		@Body() request: VerifyOtpRequest,
+		@Res({ passthrough: true }) res: Response
+	) {
+		try {
+			const response = await lastValueFrom(
+				this.authClientGrpc.verifyOtp(request)
+			)
+
+			const { accessToken, refreshToken } = response
+
+			const cookieDomain =
+				this.configService.getOrThrow<string>('COOKIES_DOMAIN')
+
+			res.cookie('refreshToken', refreshToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV !== 'development',
+				domain: cookieDomain,
+				sameSite: 'lax',
+				maxAge: 30 * 24 * 60 * 60 * 1000
+			})
+
+			return accessToken
+		} catch (error) {
+			console.error('❌ Gateway verifyOtp Error:', error)
+			throw error
+		}
 	}
 }
