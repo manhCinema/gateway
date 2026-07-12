@@ -7,7 +7,6 @@ import {
 	Post,
 	Req,
 	Res,
-	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
@@ -16,10 +15,15 @@ import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { lastValueFrom } from 'rxjs'
 import { CurrentUser, Protected } from 'src/shared/decorators'
-import { AuthGuard } from 'src/shared/guards'
 
 import { AuthClientGrpc } from './auth.grpc'
 import { SendOtpRequest, VerifyOtpRequest } from './dto'
+
+enum Role {
+	USER = 0,
+	ADMIN = 1,
+	UNRECOGNIRED = -1
+}
 
 @Controller('auth')
 export class AuthController {
@@ -116,7 +120,7 @@ export class AuthController {
 	}
 
 	@ApiBearerAuth()
-	@Protected()
+	@Protected(Role.ADMIN)
 	@Get('account')
 	public async getAccount(@CurrentUser() userId: string) {
 		return { ok: true }
