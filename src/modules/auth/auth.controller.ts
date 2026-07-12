@@ -1,18 +1,22 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
 	HttpStatus,
 	Post,
 	Req,
 	Res,
+	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { lastValueFrom } from 'rxjs'
+import { CurrentUser, Protected } from 'src/shared/decorators'
+import { AuthGuard } from 'src/shared/guards'
 
 import { AuthClientGrpc } from './auth.grpc'
 import { SendOtpRequest, VerifyOtpRequest } from './dto'
@@ -46,29 +50,24 @@ export class AuthController {
 		@Body() request: VerifyOtpRequest,
 		@Res({ passthrough: true }) res: Response
 	) {
-		try {
-			const response = await lastValueFrom(
-				this.authClientGrpc.verifyOtp(request)
-			)
+		const response = await lastValueFrom(
+			this.authClientGrpc.verifyOtp(request)
+		)
 
-			const { accessToken, refreshToken } = response
+		const { accessToken, refreshToken } = response
 
-			const cookieDomain =
-				this.configService.getOrThrow<string>('COOKIES_DOMAIN')
+		const cookieDomain =
+			this.configService.getOrThrow<string>('COOKIES_DOMAIN')
 
-			res.cookie('refreshToken', refreshToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV !== 'development',
-				domain: cookieDomain,
-				sameSite: 'lax',
-				maxAge: 30 * 24 * 60 * 60 * 1000
-			})
+		res.cookie('refreshToken', refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV !== 'development',
+			domain: cookieDomain,
+			sameSite: 'lax',
+			maxAge: 30 * 24 * 60 * 60 * 1000
+		})
 
-			return accessToken
-		} catch (error) {
-			console.error('❌ Gateway verifyOtp Error:', error)
-			throw error
-		}
+		return accessToken
 	}
 
 	@ApiOperation({
@@ -113,6 +112,13 @@ export class AuthController {
 			sameSite: 'lax',
 			expires: new Date(0)
 		})
+		return { ok: true }
+	}
+
+	@ApiBearerAuth()
+	@Protected()
+	@Get('account')
+	public async getAccount(@CurrentUser() userId: string) {
 		return { ok: true }
 	}
 }
