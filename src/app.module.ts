@@ -5,6 +5,7 @@ import { getPassportConfig } from 'src/core/config'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AccountModule } from './modules/account/account.module'
 import { AuthModule } from './modules/auth/auth.module'
 
 @Module({
@@ -13,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module'
 			isGlobal: true
 		}),
 		AuthModule,
+		AccountModule,
 		PassportModule.registerAsync({
 			useFactory: getPassportConfig,
 			inject: [ConfigService]
