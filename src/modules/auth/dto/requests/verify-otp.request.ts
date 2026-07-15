@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsNotEmpty, IsString, Length, Validate } from 'class-validator'
+import {
+	IsEnum,
+	IsNotEmpty,
+	IsNumberString,
+	IsString,
+	Length,
+	Validate
+} from 'class-validator'
 import { IdentifierValidator } from 'src/shared/validators'
 
 export class VerifyOtpRequest {
@@ -16,7 +23,7 @@ export class VerifyOtpRequest {
 		example: '123456'
 	})
 	@IsNotEmpty()
-	@IsString()
+	@IsNumberString()
 	@Length(6, 6)
 	public code!: string
 

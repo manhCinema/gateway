@@ -2,6 +2,7 @@ import { PROTO_PATHS } from '@manhdev2/contracts'
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ClientsModule, Transport } from '@nestjs/microservices'
+import { AccountController } from 'src/modules/account/account.controller'
 import { AccountClientGrpc } from 'src/modules/account/account.grpc'
 
 @Module({
@@ -22,6 +23,7 @@ import { AccountClientGrpc } from 'src/modules/account/account.grpc'
 		])
 	],
 	providers: [AccountClientGrpc],
-	exports: [AccountClientGrpc]
+	exports: [AccountClientGrpc],
+	controllers: [AccountController]
 })
 export class AccountModule {}
