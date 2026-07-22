@@ -2,6 +2,7 @@ import {
 	AuthServiceClient,
 	RefreshRequest,
 	SendOtpRequest,
+	TelegramConsumeRequest,
 	TelegramVerifyRequest
 } from '@manhdev2/contracts/gen/auth'
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
@@ -35,5 +36,8 @@ export class AuthClientGrpc implements OnModuleInit {
 	}
 	public telegramVerify(request: TelegramVerifyRequest) {
 		return this.authService.telegramVerify(request)
+	}
+	public telegramConsume(request: TelegramConsumeRequest) {
+		return this.authService.telegramConsume(request)
 	}
 }
